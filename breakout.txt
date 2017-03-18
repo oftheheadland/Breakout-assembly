@@ -1,0 +1,443 @@
+;breakout andrew vanness 206
+;30ac2
+
+	.model tiny
+	.code
+start:
+
+	; set up 
+	cli
+	mov ax,1234h
+	mov ax,cs
+	mov ds,ax
+	
+	mov ax,0b800h
+	mov es,ax
+	
+	;draw ball  
+	mov	al, 11h		;ball is blue
+	mov si, ballx
+	add si, bally	;si now holds the memory address where's we'll put the ball's color
+	mov	[es:si],al	;draw the ball
+
+	
+	;draw paddle
+	mov bp,12
+paddloop:
+	
+	;draw the green square
+	mov al, 22h
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+
+	;loop conditions
+	add paddx,2
+	sub bp,1
+	cmp bp,0
+	jnz paddloop
+	
+	mov bp,12  ;fix memory of paddx
+	paddfix:
+	sub paddx,2
+	sub bp,1
+	cmp bp,0
+	jnz paddfix
+	
+	;draw walls
+	mov si,499
+	mov bp,30
+wallloop:
+	
+	add si,4
+	mov al,0
+	mov [es:si],al
+	mov al,55h
+	;add si,1		;color follows letter
+	mov [es:si],al
+	
+	sub bp,1
+	cmp bp,0
+	jnz wallloop
+
+;\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
+
+;keyboard stuff
+
+
+;        in al,64h	; read from the keyboard command port
+;        and al,1	; get rid of all but the last bit
+;        jz nokey	; if it's zero, no key is pressed
+;        in al,60h	; get the keycode
+;        cmp al,4bh	; 4b is left arrow (4d is right arrow)
+;        jz moveleft	; handle left arrow
+;        jmp clrbuf	; clear the keyboard buffer
+;left:	; move paddle left
+;clrbuf:			; go here after you move the paddle
+;        in al,60h	; read from the keyboard and throw away
+;        in al,64h	; check if the buffer is empty
+;        and al,1
+;        jnz clrbuf	; if it isn't, read again
+;nokey:
+
+
+
+	
+
+
+
+
+	
+	
+	;color reminder
+	;mov	al, 11h		;ball is blue
+	;mov si, ballx
+	;add si, bally	;si now holds the memory address where's we'll put the ball's color
+	;mov	[es:si],al	;draw the ball
+	
+	
+
+	mov cx,10
+	
+	;set memory as registers, bad to mess with mem?
+	mov sp,ballx    ;81
+	mov dx,balldx    ;2
+	mov bp,bally     ;1600
+	mov di,balldy    ;-160
+	;mov ah, 10
+	
+	;whileloop:
+	;check if bl<ah
+	;cmp ah,bl
+	; if so, quit loop
+	;jl quitloop
+	; b=b-a
+	;sub bl,5
+	
+	delay: sub cx,1
+	
+	
+	
+	;LOOP HERE
+	
+	;bounds for ball
+	
+	bound1:
+	cmp bp,0
+	JNZ quitbound1
+	mov di,160
+	quitbound1:
+	
+	bound2: ;
+	cmp sp,1
+	JNZ quitbound2
+	;sub dx,4
+	add dx,4
+	quitbound2:
+	
+	bound3:
+	cmp sp,159
+	JNZ quitbound3
+	;add dx,4
+	sub dx,4
+	quitbound3:
+	
+	bound4:
+	cmp bp,3520
+	JNZ quitbound4
+	;mov ah,0			
+	;int 21h
+	mov al,0
+	mov si, sp
+	add si, bp
+	mov [es:si],al
+	jmp start 
+	quitbound4:
+	
+	
+nope: jmp yep
+	moveleft:	; move paddle left
+
+;cant get here
+
+	
+;print L
+	;mov ah,2
+	;mov dl, 'L'
+	;int 21h
+	; clear the buffer
+	
+	;mov al, 22h
+	;mov si,paddx
+	;add si,paddy
+	;mov [es:si],al
+	
+	add paddx,22
+	mov al, 0
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+	sub paddx,22
+	
+	
+	
+	
+	sub paddx,2
+	mov al, 22h
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+	
+	add paddx,22
+	mov al, 0
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+	sub paddx,22
+	
+	sub paddx,2
+	mov al, 22h
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+
+	jmp clrbuf
+
+
+
+doright:
+	; print R
+;	mov ah,2
+;	mov dl,'R'
+;	int 21h
+	;and clear
+	
+	
+	;rightmem dw  3
+	
+	;actualright:
+	
+	add paddx,24
+	mov al, 22h
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+	sub paddx,24
+	
+	add paddx,26
+	mov al, 22h
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+	sub paddx,26
+	
+	mov al, 0
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+	add paddx,2
+	
+	mov al, 0
+	mov si,paddx
+	add si,paddy
+	mov [es:si],al
+	add paddx,2
+	
+	;sub rightmem,1
+	;cmp si,0
+	;jz actualright
+	
+	jmp clrbuf	
+	
+yep:	
+	
+	;ball render stuff
+	
+	mov al, 11h
+	mov si, sp
+	add si, bp
+	mov [es:si],al
+	
+	mov cx, 3000h
+	delay6:	sub cx,1
+	
+	    in al,64h	; read from the keyboard command port
+        and al,1	; get rid of all but the last bit
+        jz nokey	; if it's zero, no key is pressed
+        in al,60h	; get the keycode
+        cmp al,4bh	; 4b is left arrow (4d is right arrow)
+        jz moveleft2	; handle left arrow
+		cmp al,4dh
+		jz doright2
+        jmp clrbuf	; clear the keyboard buffer
+
+	
+	moveleft2: jmp moveleft
+	
+	doright2: jmp doright
+	
+clrbuf:			; go here after you move the paddle
+        in al,60h	; read from the keyboard and throw away
+        in al,64h	; check if the buffer is empty
+        and al,1
+        jnz clrbuf	; if it isn't, read again
+nokey:
+
+	
+	
+	
+	;jnz delay6
+	
+	mov cx, 3000h
+	delay7:	sub cx,1
+	jnz delay7
+	
+	;make current ball black
+	mov al,0
+	mov si, sp
+	add si, bp
+	mov [es:si],al
+	
+
+	
+	;registers to change where ball is
+	;x
+	mov ax,sp
+	mov bx,dx
+	add ax,bx
+	mov sp,ax
+
+	
+	;y
+	mov ax,bp
+	mov bx,di
+	add ax,bx
+	mov bp,ax
+	
+	;draw new ball
+	mov al, 11h
+	mov si, sp
+	add si, bp
+	mov [es:si],al
+	
+	;ball paddle interaction
+;After moving the ball, check the following:
+;1. Is the ball moving downwards: is balldy>0?
+;2. Is it at or past the top of the paddle: is bally>=3040?
+;3. Is ballx right of paddx?
+;4. Is ballx left of paddx+20?
+
+;If all of these are true, then set balldy to -balldy.
+
+
+;set memory as registers, bad to mess with mem?
+	;mov sp,ballx    ;81
+	;mov dx,balldx    ;2
+	;mov bp,bally     ;1600
+	;mov di,balldy    ;-160
+
+
+
+rule1:
+
+	;1 balldy>0
+	mov cx,di
+	
+	cmp cx,0
+	jg rule2
+	
+	jmp delay
+rule2:
+	;2 bally>=3040
+	mov cx,bp
+	cmp cx,3040
+	;jz rule3
+	jge rule3
+	jmp delay
+rule3:
+	;3 ballx right of paddx
+	mov cx,sp
+	mov si,paddx
+	sub si,3
+	;mov sp,paddx
+	;cmp sp,cx
+	cmp cx,si
+	jg rule4
+	jmp delay
+	
+	
+rule4:
+	;4 ballx left of paddx+20
+	mov cx,sp
+	mov si,paddx
+	add si,25
+	;cmp cx,sp
+	cmp si,cx
+	jg rule5
+	jmp delay
+
+rule5:
+	;set balldy to -balldy
+	;mov balldy,0ff60h
+	sub di,320
+	
+	
+	
+	
+	
+	
+	;mov ah,250
+	;delay2:
+	;sub ah,1
+	;jnz delay2
+
+	
+	; repeat
+	jmp delay
+	;jmp whileloop
+	
+	
+quitloop:
+	
+
+
+	mov ah,0			
+	int 21h
+
+	
+	 
+	
+	
+		
+;end program
+	
+;memory stuff
+
+bally	dw	1600
+ballx	dw	81
+
+; the current speed of the ball.  
+; it's moving upwards (negatively) by -1 in the y direction
+; and rightwards  by +1 in the x direction
+
+balldy	dw	0ff60h		; -160 in 2's complement, or 1 row up
+balldx	dw	2		; +2, or 1 space to the right
+
+; the left position of the paddle
+
+paddx	dw	67	
+paddy   dw  3200
+
+
+; the paddle starts at 33 from the left, or 67 bytes in
+
+
+
+	end
+	
+	
+
+	
+	
+	
+	
